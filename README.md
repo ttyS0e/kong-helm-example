@@ -78,9 +78,6 @@ helm repo update
 admin:
   ingress:
     hostname: <desired kong admin ingress url>  # my example - kong-admin.kong-cp.jackdomain
-admin:
-  ingress:
-    hostname: <desired admin api ingress url>
 
 manager:
   ingress:
