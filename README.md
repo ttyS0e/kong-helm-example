@@ -49,20 +49,20 @@ openssl req -new -x509 -nodes -newkey ec:<(openssl ecparam -name secp384r1) \
 kubectl create secret tls kong-cluster-cert --cert=$(pwd)/cluster-certs/cluster.crt --key=$(pwd)/cluster-certs//cluster.key
 ```
 
+- Create the super admin password secret:
+
+```sh
+kubectl create secret generic kong-enterprise-superuser-password --from-literal=password=jackpassword
+```
+
 - Create the session config secret:
 
 ```sh
-echo '{"cookie_name":"admin_session","cookie_samesite":"off","secret":"admin-secret-CHANGEME","cookie_secure":true,"storage":"kong"}' > admin_gui.conf
-echo '{"cookie_name":"portal_session","cookie_samesite":"off","secret":"portal-secret-CHANGEME","cookie_secure":true,"storage":"kong"}' > portal_gui.conf
+echo '{"cookie_name":"admin_session","cookie_samesite":"off","secret":"admin-secret-CHANGEME","cookie_secure":false,"storage":"kong"}' > admin_gui.conf
+echo '{"cookie_name":"portal_session","cookie_samesite":"off","secret":"portal-secret-CHANGEME","cookie_secure":false,"storage":"kong"}' > portal_gui.conf
 kubectl create secret generic kong-session-config --from-file=admin_gui_session_conf=admin_gui.conf --from-file=portal_session_conf=portal_gui.conf
 rm -f ./admin_gui.conf
 rm -f ./portal_gui.conf
-```
-
-- Change directory to the control plane folder:
-
-```sh
-cd control-plane
 ```
 
 - Add the Kong Helm repository and pull it:
@@ -72,14 +72,78 @@ helm repo add kong https://charts.konghq.com
 helm repo update
 ```
 
-- Construct a `values-override.yaml` file using the following template:
+- Construct a `cp-values-override.yaml` file using the following template:
 
 ```yaml
+admin:
+  ingress:
+    hostname: <desired kong admin ingress url>  # my example - kong-admin.kong-cp.jackdomain
+admin:
+  ingress:
+    hostname: <desired admin api ingress url>
 
+manager:
+  ingress:
+    hostname: <desired manager ui ingress url>
+
+portal:
+  ingress:
+    hostname: <desired portal ingress url>
+
+portalapi:
+  ingress:
+    hostname: <desired portal api ingress url>
 ```
 
 - Install the control plane:
 
 ```sh
-helm upgrade -i kong kong/kong -f values.yaml -f values-override.yaml
+helm upgrade -i kong kong/kong -f cp-values.yaml -f cp-values-override.yaml
+```
+
+### Data Plane
+- Change your `kubectl` context to the cluster that will run the **data plane** (example here):
+
+```sh
+kubectl config set-context kong-data-plane-cluster
+```
+
+- Create a data plane namespace and focus on it:
+
+```sh
+kubectl create namespace kong-data-plane
+kubectl config set-context --current --namespace kong-data-plane
+```
+
+- Upload your Kong Enterprise license as a secret:
+
+```sh
+kubectl create secret generic kong-enterprise-license --from-file=license=<license_json_file_path>
+```
+
+- Create the cluster certificates as a secret:
+
+```sh
+kubectl create secret tls kong-cluster-cert --cert=$(pwd)/cluster-certs/cluster.crt --key=$(pwd)/cluster-certs/cluster.key
+```
+
+- Add the Kong Helm repository and pull it:
+
+```sh
+helm repo add kong https://charts.konghq.com
+helm repo update
+```
+
+- Construct a `dp-values-override.yaml` file using the following template:
+
+```yaml
+proxy:
+  ingress:
+    hostname: <desired proxy gateway ingress url>  # my example - proxy.kong-dp.jackdomain
+```
+
+- Install the data plane:
+
+```sh
+helm upgrade -i kong kong/kong -f dp-values.yaml -f dp-values-override.yaml
 ```

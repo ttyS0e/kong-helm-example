@@ -1,0 +1,44 @@
+image:
+  repository: kong/kong-gateway
+  tag: "2.6.0.0-alpine"
+
+env:
+  role: data_plane
+  database: "off"
+
+  lua_ssl_trusted_certificate: /etc/secrets/kong-cluster-cert/tls.crt
+  cluster_cert: /etc/secrets/kong-cluster-cert/tls.crt
+  cluster_cert_key: /etc/secrets/kong-cluster-cert/tls.key
+
+admin:
+  enabled: false
+
+proxy:
+  enabled: true
+  type: ClusterIP
+  http:
+    enabled: true
+    servicePort: 8000
+    containerPort: 8000
+  tls:
+    enabled: false
+    servicePort: 8000
+    containerPort: 8000
+    parameters:
+    - http2
+  ingress:
+    enabled: true
+    path: /
+
+enterprise:
+  enabled: true
+  license_secret: kong-enterprise-license
+  vitals:
+    enabled: true
+
+secretVolumes:
+- kong-cluster-cert
+
+ingressController:
+  enabled: false
+  installCRDs: false

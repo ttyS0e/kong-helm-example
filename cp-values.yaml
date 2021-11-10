@@ -11,16 +11,75 @@ env:
   pg_pass: kong
   pg_database: kong
 
+  password:
+    valueFrom:
+      secretKeyRef:
+        name: kong-enterprise-superuser-password
+        key: password
+
 admin:
   enabled: true
+  type: ClusterIP
   http:
     enabled: true
     servicePort: 8001
     containerPort: 8001
   tls:
+    enabled: false
+    servicePort: 8001
+    containerPort: 8001
+    parameters:
+    - http2
+  ingress:
     enabled: true
-    servicePort: 8444
-    containerPort: 8444
+    path: /
+
+manager:
+  enabled: true
+  type: ClusterIP
+  http:
+    enabled: true
+    servicePort: 8002
+    containerPort: 8002
+  tls:
+    enabled: false
+    servicePort: 8002
+    containerPort: 8002
+    parameters:
+    - http2
+  ingress:
+    enabled: true
+    path: /
+
+portal:
+  enabled: true
+  type: ClusterIP
+  http:
+    enabled: true
+    servicePort: 8003
+    containerPort: 8003
+  tls:
+    enabled: false
+    servicePort: 8003
+    containerPort: 8003
+    parameters:
+    - http2
+  ingress:
+    enabled: true
+    path: /
+
+
+portalapi:
+  enabled: true
+  type: ClusterIP
+  http:
+    enabled: true
+    servicePort: 8004
+    containerPort: 8004
+  tls:
+    enabled: false
+    servicePort: 8004
+    containerPort: 8004
     parameters:
     - http2
   ingress:
@@ -29,6 +88,7 @@ admin:
 
 cluster:
   enabled: true
+  type: LoadBalancer
   tls:
     enabled: true
     servicePort: 8005
@@ -36,6 +96,7 @@ cluster:
 
 clustertelemetry:
   enabled: true
+  type: LoadBalancer
   tls:
     enabled: true
     servicePort: 8006
@@ -77,6 +138,7 @@ secretVolumes:
 postgresql:
   enabled: true
   postgresqlUsername: kong
+  postgresqlPassword: kong
   postgresqlDatabase: kong
   service:
     port: 5432

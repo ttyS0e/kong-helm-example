@@ -1,2 +1,4 @@
 **/values-override.yaml
-control-plane/cluster-certs/
+**/cluster-certs/
+*.conf
+**/*-override.yaml
