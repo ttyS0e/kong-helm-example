@@ -7,28 +7,30 @@ env:
   pg_user: kong
   pg_password: kong
   pg_database: kong
+  admin_api_uri: "https://kong-admin.k3s.local"
+  admin_gui_url: "https://kong-manager.k3s.local"
   
+  role: control_plane
+  cluster_cert: /etc/secrets/kong-cluster-cert/tls.crt
+  cluster_cert_key: /etc/secrets/kong-cluster-cert/tls.key
+
   password:
     valueFrom:
       secretKeyRef:
         name: kong-enterprise-superuser-password
         key: password
 
+  portal_session_conf:
+    valueFrom:
+      secretKeyRef:
+        name: kong-session-config
+        key: portal_session_conf
+
+secretVolumes:
+- kong-cluster-cert
+
 proxy:
-  enabled: true
-  type: ClusterIP
-  http:
-    enabled: true
-    servicePort: 8000
-    containerPort: 8000
-  tls:
-    enabled: true
-    servicePort: 8443
-    containerPort: 8443
-    parameters:
-    - http2
-  ingress:
-    enabled: false
+  enabled: false
 
 admin:
   enabled: true
@@ -38,13 +40,14 @@ admin:
     servicePort: 8001
     containerPort: 8001
   tls:
-    enabled: true
-    servicePort: 8444
-    containerPort: 8444
+    enabled: false
+    servicePort: 8001
+    containerPort: 8001
     parameters:
     - http2
   ingress:
-    enabled: false
+    enabled: true
+    hostname: kong-admin.k3s.local
     path: /
 
 manager:
@@ -55,13 +58,14 @@ manager:
     servicePort: 8002
     containerPort: 8002
   tls:
-    enabled: true
-    servicePort: 8445
-    containerPort: 8445
+    enabled: false
+    servicePort: 8002
+    containerPort: 8002
     parameters:
     - http2
   ingress:
-    enabled: false
+    enabled: true
+    hostname: kong-manager.k3s.local
     path: /
 
 portal:
@@ -72,13 +76,14 @@ portal:
     servicePort: 8003
     containerPort: 8003
   tls:
-    enabled: true
-    servicePort: 8446
-    containerPort: 8446
+    enabled: false
+    servicePort: 8003
+    containerPort: 8003
     parameters:
     - http2
   ingress:
-    enabled: false
+    enabled: true
+    hostname: kong-portal.k3s.local
     path: /
 
 portalapi:
@@ -89,25 +94,25 @@ portalapi:
     servicePort: 8004
     containerPort: 8004
   tls:
-    enabled: true
-    servicePort: 8447
-    containerPort: 8447
+    enabled: false
+    servicePort: 8004
+    containerPort: 8004
     parameters:
     - http2
   ingress:
-    enabled: false
+    enabled: true
+    hostname: kong-portalapi.k3s.local
     path: /
 
-
 cluster:
-  enabled: false
+  enabled: true
   tls:
     enabled: true
     servicePort: 8005
     containerPort: 8005
 
 clustertelemetry:
-  enabled: false
+  enabled: true
   tls:
     enabled: true
     servicePort: 8006
@@ -121,7 +126,9 @@ enterprise:
   portal:
     enabled: true
   rbac:
-    enabled: false
+    enabled: true
+    admin_gui_auth: basic-auth
+    session_conf_secret: kong-session-config
   smtp:
     enabled: false
 

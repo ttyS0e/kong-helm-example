@@ -7,7 +7,9 @@ env:
   pg_user: kong
   pg_password: kong
   pg_database: kong
-  
+  admin_api_uri: "https://kong-admin.k3s.local"
+  admin_gui_url: "https://kong-manager.k3s.local"
+
   password:
     valueFrom:
       secretKeyRef:
@@ -22,13 +24,16 @@ proxy:
     servicePort: 8000
     containerPort: 8000
   tls:
-    enabled: true
-    servicePort: 8443
-    containerPort: 8443
+    enabled: false
+    servicePort: 8000
+    containerPort: 8000
     parameters:
     - http2
+  ##
   ingress:
-    enabled: false
+    enabled: true
+    hostname: kong-proxy.k3s.local
+    path: /
 
 admin:
   enabled: true
@@ -38,13 +43,14 @@ admin:
     servicePort: 8001
     containerPort: 8001
   tls:
-    enabled: true
-    servicePort: 8444
-    containerPort: 8444
+    enabled: false
+    servicePort: 8001
+    containerPort: 8001
     parameters:
     - http2
   ingress:
-    enabled: false
+    enabled: true
+    hostname: kong-admin.k3s.local
     path: /
 
 manager:
@@ -55,13 +61,14 @@ manager:
     servicePort: 8002
     containerPort: 8002
   tls:
-    enabled: true
-    servicePort: 8445
-    containerPort: 8445
+    enabled: false
+    servicePort: 8002
+    containerPort: 8002
     parameters:
     - http2
   ingress:
-    enabled: false
+    enabled: true
+    hostname: kong-manager.k3s.local
     path: /
 
 portal:
@@ -72,13 +79,14 @@ portal:
     servicePort: 8003
     containerPort: 8003
   tls:
-    enabled: true
-    servicePort: 8446
-    containerPort: 8446
+    enabled: false
+    servicePort: 8003
+    containerPort: 8003
     parameters:
     - http2
   ingress:
-    enabled: false
+    enabled: true
+    hostname: kong-portal.k3s.local
     path: /
 
 portalapi:
@@ -89,25 +97,26 @@ portalapi:
     servicePort: 8004
     containerPort: 8004
   tls:
-    enabled: true
-    servicePort: 8447
-    containerPort: 8447
+    enabled: false
+    servicePort: 8004
+    containerPort: 8004
     parameters:
     - http2
   ingress:
-    enabled: false
+    enabled: true
+    hostname: kong-portalapi.k3s.local
     path: /
 
 
 cluster:
-  enabled: false
+  enabled: true
   tls:
     enabled: true
     servicePort: 8005
     containerPort: 8005
 
 clustertelemetry:
-  enabled: false
+  enabled: true
   tls:
     enabled: true
     servicePort: 8006

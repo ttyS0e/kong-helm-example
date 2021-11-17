@@ -1,62 +1,72 @@
 image:
   repository: kong/kong-gateway
-  tag: "2.6.0.0-alpine-oidc-2.1.1"
+  tag: "2.6.0.0-alpine"
 
 env:
   database: postgres
-  role: control_plane
-  cluster_cert: /etc/secrets/kong-cluster-cert/tls.crt
-  cluster_cert_key: /etc/secrets/kong-cluster-cert/tls.key
   pg_user: kong
-  pg_pass: kong
+  pg_password: kong
   pg_database: kong
-  portal_auth: basic-auth
 
-  portal_session_conf:
-    valueFrom:
-      secretKeyRef:
-        name: kong-session-config
-        key: portal_session_conf
-
+  ##
+  admin_api_uri: "http://192.168.64.2:8001"
+ 
   password:
     valueFrom:
       secretKeyRef:
         name: kong-enterprise-superuser-password
         key: password
 
+proxy:
+  enabled: true
+  type: LoadBalancer
+  http:
+    enabled: true
+    servicePort: 8000
+    containerPort: 8000
+  tls:
+    enabled: true
+    servicePort: 8443
+    containerPort: 8443
+    parameters:
+    - http2
+  ingress:
+    enabled: false
+
 admin:
   enabled: true
-  type: ClusterIP
+  type: LoadBalancer
   http:
     enabled: true
     servicePort: 8001
     containerPort: 8001
   tls:
-    enabled: false
-    servicePort: 8001
-    containerPort: 8001
+    enabled: true
+    servicePort: 8444
+    containerPort: 8444
     parameters:
     - http2
   ingress:
-    enabled: true
+    enabled: false
     path: /
 
 manager:
   enabled: true
-  type: ClusterIP
+  type: LoadBalancer
   http:
     enabled: true
     servicePort: 8002
     containerPort: 8002
   tls:
-    enabled: false
-    servicePort: 8002
-    containerPort: 8002
+    enabled: true
+    servicePort: 8445
+    containerPort: 8445
     parameters:
     - http2
   ingress:
-    enabled: true
+    enabled: false
     path: /
+    annotations:
 
 portal:
   enabled: true
@@ -66,36 +76,35 @@ portal:
     servicePort: 8003
     containerPort: 8003
   tls:
-    enabled: false
-    servicePort: 8003
-    containerPort: 8003
+    enabled: true
+    servicePort: 8446
+    containerPort: 8446
     parameters:
     - http2
   ingress:
-    enabled: true
+    enabled: false
     path: /
-
 
 portalapi:
   enabled: true
   type: ClusterIP
   http:
-    enabled: true
+    enabled: true 
     servicePort: 8004
     containerPort: 8004
   tls:
-    enabled: false
-    servicePort: 8004
-    containerPort: 8004
+    enabled: true
+    servicePort: 8447
+    containerPort: 8447
     parameters:
     - http2
   ingress:
-    enabled: true
+    enabled: false
     path: /
+
 
 cluster:
   enabled: true
-  type: LoadBalancer
   tls:
     enabled: true
     servicePort: 8005
@@ -103,7 +112,6 @@ cluster:
 
 clustertelemetry:
   enabled: true
-  type: LoadBalancer
   tls:
     enabled: true
     servicePort: 8006
@@ -117,30 +125,9 @@ enterprise:
   portal:
     enabled: true
   rbac:
-    enabled: true
-    admin_gui_auth: basic-auth
-    session_conf_secret: kong-session-config
+    enabled: false
   smtp:
     enabled: false
-    portal_emails_from: none@example.com
-    portal_emails_reply_to: none@example.com
-    admin_emails_from: none@example.com
-    admin_emails_reply_to: none@example.com
-    smtp_admin_emails: none@example.com
-    smtp_host: smtp.example.com
-    smtp_port: 587
-    smtp_auth_type: ''
-    smtp_ssl: nil
-    smtp_starttls: true
-    auth:
-      smtp_username: ''  # e.g. postmaster@example.com
-      smtp_password_secret: CHANGEME-smtp-password
-
-proxy:
-  enabled: false
-
-secretVolumes:
-- kong-cluster-cert
 
 postgresql:
   enabled: true

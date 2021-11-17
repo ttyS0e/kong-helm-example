@@ -23,6 +23,12 @@ kubectl config set-context --current --namespace kong-control-plane
 kubectl create secret generic kong-enterprise-license --from-file=license=<license_json_file_path>
 ```
 
+- Create the super admin password secret:
+
+```sh
+kubectl create secret generic kong-enterprise-superuser-password --from-literal=password=secure-password-here
+```
+
 - Add the Kong Helm repository and pull it:
 
 ```sh

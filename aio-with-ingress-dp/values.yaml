@@ -1,14 +1,20 @@
 image:
   repository: kong/kong-gateway
-  tag: "2.6.0.0-alpine-oidc-2.1.1"
+  tag: "2.6.0.0-alpine"
 
 env:
   role: data_plane
   database: "off"
 
   lua_ssl_trusted_certificate: /etc/secrets/kong-cluster-cert/tls.crt
+
+  ##
   cluster_cert: /etc/secrets/kong-cluster-cert/tls.crt
   cluster_cert_key: /etc/secrets/kong-cluster-cert/tls.key
+
+  ##
+  cluster_control_plane: "kong-kong-cluster.kong-control-plane.svc:8005"
+  cluster_telemetry_endpoint: "kong-kong-clustertelemetry.kong-control-plane.svc:8006"
 
 admin:
   enabled: false
@@ -28,6 +34,7 @@ proxy:
     - http2
   ingress:
     enabled: true
+    hostname: kong-proxy.k3s.local
     path: /
 
 enterprise:
@@ -42,3 +49,6 @@ secretVolumes:
 ingressController:
   enabled: false
   installCRDs: false
+
+postgresql:
+  enabled: false

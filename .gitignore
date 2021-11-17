@@ -3,3 +3,4 @@
 *.conf
 *-override.yaml
 cp-values.override.yaml
+sample-command.sh
