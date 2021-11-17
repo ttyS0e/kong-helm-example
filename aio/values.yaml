@@ -1,0 +1,136 @@
+image:
+  repository: kong/kong-gateway
+  tag: "2.6.0.0-alpine"
+
+env:
+  database: postgres
+  role: control_plane
+  pg_user: kong
+  pg_pass: kong
+  pg_database: kong
+
+proxy:
+  enabled: true
+  type: ClusterIP
+  http:
+    enabled: true
+    servicePort: 8000
+    containerPort: 8000
+  tls:
+    enabled: true
+    servicePort: 8443
+    containerPort: 8443
+    parameters:
+    - http2
+  ingress:
+    enabled: true
+    path: /
+
+admin:
+  enabled: true
+  type: ClusterIP
+  http:
+    enabled: true
+    servicePort: 8001
+    containerPort: 8001
+  tls:
+    enabled: true
+    servicePort: 8444
+    containerPort: 8444
+    parameters:
+    - http2
+  ingress:
+    enabled: true
+    path: /
+
+manager:
+  enabled: true
+  type: ClusterIP
+  http:
+    enabled: true
+    servicePort: 8002
+    containerPort: 8002
+  tls:
+    enabled: true
+    servicePort: 8445
+    containerPort: 8445
+    parameters:
+    - http2
+  ingress:
+    enabled: true
+    path: /
+
+portal:
+  enabled: true
+  type: ClusterIP
+  http:
+    enabled: true
+    servicePort: 8003
+    containerPort: 8003
+  tls:
+    enabled: true
+    servicePort: 8446
+    containerPort: 8446
+    parameters:
+    - http2
+  ingress:
+    enabled: true
+    path: /
+
+portalapi:
+  enabled: true
+  type: ClusterIP
+  http:
+    enabled: true 
+    servicePort: 8004
+    containerPort: 8004
+  tls:
+    enabled: true
+    servicePort: 8447
+    containerPort: 8447
+    parameters:
+    - http2
+  ingress:
+    enabled: true
+    path: /
+
+
+cluster:
+  enabled: true
+  tls:
+    enabled: true
+    servicePort: 8005
+    containerPort: 8005
+
+clustertelemetry:
+  enabled: true
+  tls:
+    enabled: true
+    servicePort: 8006
+    containerPort: 8006
+
+enterprise:
+  enabled: true
+  license_secret: kong-enterprise-license
+  vitals:
+    enabled: true
+  portal:
+    enabled: true
+  rbac:
+    enabled: false
+  smtp:
+    enabled: false
+
+secretVolumes:
+- kong-cluster-cert
+
+postgresql:
+  enabled: true
+  postgresqlUsername: kong
+  postgresqlDatabase: kong
+  service:
+    port: 5432
+
+ingressController:
+  enabled: false
+  installCRDs: false
