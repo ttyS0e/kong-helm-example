@@ -1,6 +1,6 @@
 image:
   repository: kong/kong-gateway
-  tag: "2.6.0.0-alpine"
+  tag: "2.6.0.0-alpine-oidc-2.1.1"
 
 env:
   role: data_plane

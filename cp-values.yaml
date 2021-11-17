@@ -1,6 +1,6 @@
 image:
   repository: kong/kong-gateway
-  tag: "2.6.0.0-alpine"
+  tag: "2.6.0.0-alpine-oidc-2.1.1"
 
 env:
   database: postgres
@@ -10,6 +10,13 @@ env:
   pg_user: kong
   pg_pass: kong
   pg_database: kong
+  portal_auth: basic-auth
+
+  portal_session_conf:
+    valueFrom:
+      secretKeyRef:
+        name: kong-session-config
+        key: portal_session_conf
 
   password:
     valueFrom:

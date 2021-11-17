@@ -137,6 +137,8 @@ helm repo update
 proxy:
   ingress:
     hostname: <desired proxy gateway ingress url>  # my example - proxy.kong-dp.jackdomain
+env:
+  cluster_control_plane: <kong-control-plane-service-url>  # my example - cluster-lb.kong-cp.jackdomain
 ```
 
 - Install the data plane:
