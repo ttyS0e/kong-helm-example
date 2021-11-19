@@ -1,0 +1,92 @@
+image:
+  repository: kong/kong-gateway
+  tag: "2.6.0.0-alpine"
+
+migrations:
+  init: false
+  preUpgrade: false
+  postUpgrade: false
+
+env:
+  database: postgres
+  pg_user: kong
+  pg_password: kong
+  pg_database: kong
+  pg_host: kong-cp-postgresql
+  admin_api_uri: "https://kong-admin.k3s.local"
+  portal_gui_host: "kong-portal.k3s.local"
+  portal_gui_protocol: "https"
+  portal_api_url: "https://portalapi.k3s.local"
+
+  password:
+    valueFrom:
+      secretKeyRef:
+        name: kong-enterprise-superuser-password
+        key: password
+
+  portal_session_conf:
+    valueFrom:
+      secretKeyRef:
+        name: kong-session-config
+        key: portal_session_conf
+
+proxy:
+  enabled: true
+  type: ClusterIP
+  http:
+    enabled: true
+    servicePort: 8000
+    containerPort: 8000
+  tls:
+    enabled: false
+    servicePort: 8000
+    containerPort: 8000
+    parameters:
+    - http2
+  ingress:
+    enabled: true
+    hostname: kong-proxy.k3s.local
+    path: /
+
+admin:
+  enabled: false
+
+manager:
+  enabled: false
+
+portal:
+  enabled: false
+
+portalapi:
+  enabled: false
+
+cluster:
+  enabled: false
+
+clustertelemetry:
+  enabled: true
+  tls:
+    enabled: true
+    servicePort: 8006
+    containerPort: 8006
+
+enterprise:
+  enabled: true
+  license_secret: kong-enterprise-license
+  vitals:
+    enabled: true
+  portal:
+    enabled: true
+  rbac:
+    enabled: true
+    admin_gui_auth: basic-auth
+    session_conf_secret: kong-session-config
+  smtp:
+    enabled: false
+
+postgresql:
+  enabled: false
+
+ingressController:
+  enabled: false
+  installCRDs: false

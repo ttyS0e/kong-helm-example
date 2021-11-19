@@ -9,10 +9,9 @@ env:
   pg_database: kong
   admin_api_uri: "https://kong-admin.k3s.local"
   admin_gui_url: "https://kong-manager.k3s.local"
-  
-  role: control_plane
-  cluster_cert: /etc/secrets/kong-cluster-cert/tls.crt
-  cluster_cert_key: /etc/secrets/kong-cluster-cert/tls.key
+  portal_gui_host: "kong-portal.k3s.local"
+  portal_gui_protocol: "https"
+  portal_api_url: "https://portalapi.k3s.local"
 
   password:
     valueFrom:
@@ -25,9 +24,6 @@ env:
       secretKeyRef:
         name: kong-session-config
         key: portal_session_conf
-
-secretVolumes:
-- kong-cluster-cert
 
 proxy:
   enabled: false
@@ -105,9 +101,9 @@ portalapi:
     path: /
 
 cluster:
-  enabled: true
+  enabled: false
   tls:
-    enabled: true
+    enabled: false
     servicePort: 8005
     containerPort: 8005
 
