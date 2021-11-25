@@ -34,6 +34,7 @@ paths:
           schema:
             type: integer
             format: int32
+      # This additional annotation causes Inso CLI to generate the validator plugins to go with this route
       x-kong-plugin-request-validator:
         enabled: true
       responses:
@@ -74,6 +75,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+      # This additional annotation causes Inso CLI to generate the validator plugins to go with this route
       x-kong-plugin-request-validator:
         enabled: true
   /pets/{id}:
