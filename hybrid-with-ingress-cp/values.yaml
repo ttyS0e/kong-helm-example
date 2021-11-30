@@ -9,10 +9,10 @@ env:
   pg_database: kong
   admin_api_uri: "https://kong-admin.k3s.local"
   admin_gui_url: "https://kong-manager.k3s.local"
-  portal_gui_host: "kong-portal.k3s.local"
+  portal_gui_host: "kong-portal.k3s.local:443"
   portal_gui_protocol: "https"
-  portal_api_url: "https://portalapi.k3s.local"
-  
+  portal_api_url: "https://kong-portalapi.k3s.local"
+
   role: control_plane
   cluster_cert: /etc/secrets/kong-cluster-cert/tls.crt
   cluster_cert_key: /etc/secrets/kong-cluster-cert/tls.key
@@ -134,6 +134,19 @@ enterprise:
     session_conf_secret: kong-session-config
   smtp:
     enabled: false
+    portal_emails_from: none@example.com
+    portal_emails_reply_to: none@example.com
+    admin_emails_from: none@example.com
+    admin_emails_reply_to: none@example.com
+    smtp_admin_emails: none@example.com
+    smtp_host: smtp.example.com
+    smtp_port: 587
+    smtp_auth_type: ''
+    smtp_ssl: nil
+    smtp_starttls: true
+    auth:
+      smtp_username: ''  # e.g. postmaster@example.com
+      smtp_password_secret: CHANGEME-smtp-password
 
 postgresql:
   enabled: true
