@@ -11,6 +11,6 @@ ingressController:
     kong_admin_token:
       valueFrom:
         secretKeyRef:
-           name: CHANGEME-admin-token-secret  # put your admin token secret info here - same as the other ingress controller has
-           key: CHANGEME-admin-token-key
-    apiserver_host: kong-cp.kong-control-plane.svc.cluster.local  # set this to the Kong control plane you're trying to create resources on
+           name: admin-token-secret  # put your admin token secret info here - same as the other ingress controller has
+           key: admin-token-key
+    kong_admin_url: https://kong-kong-admin.kong-control-plane.svc.cluster.local:8444 # set this to the Kong control plane you're trying to create resources on
