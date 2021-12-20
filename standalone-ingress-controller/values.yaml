@@ -1,0 +1,16 @@
+deployment:
+  kong:
+    enabled: false
+
+ingressController:
+  enabled: true
+  watchNamespace: different-namespace  # optional - will only create Kong objects when ingresses and services are created in this namespace
+  ingressClass: kong-different-workspace-class  # should be different from the default "kong" - you can name-match it to your kong workspaces, for example. https://docs.konghq.com/kubernetes-ingress-controller/#ingress-classes
+  env:
+    kong_workspace: different-workspace  # tells it which Kong workspace to create stuff in
+    kong_admin_token:
+      valueFrom:
+        secretKeyRef:
+           name: CHANGEME-admin-token-secret  # put your admin token secret info here - same as the other ingress controller has
+           key: CHANGEME-admin-token-key
+    apiserver_host: kong-cp.kong-control-plane.svc.cluster.local  # set this to the Kong control plane you're trying to create resources on
