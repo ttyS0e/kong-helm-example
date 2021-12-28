@@ -4,13 +4,19 @@ deployment:
 
 ingressController:
   enabled: true
-  watchNamespaces:
-  - workspace2  # namespace to watch for Kubernetes objects
+  ingressClass: kong-workspace2
+
+  # watchNamespaces:
+  # - workspace1  # namespace to watch for Kubernetes objects
   env:
     kong_workspace: workspace2 # tells it which Kong workspace to create stuff in
+    publish_service: kong-data-plane/kong-kong-proxy
+    admin_filter_tag: kong-workspace2
+
     kong_admin_token:
       valueFrom:
         secretKeyRef:
-           name: admin-token-secret  # put your admin token secret info here - same as the other ingress controller has
+          name: admin-token-secret  # put your admin token secret info here - same as the other ingress controller has
            key: admin-token-key
+           
     kong_admin_url: https://kong-kong-admin.kong-control-plane.svc.cluster.local:8444 # set this to the Kong control plane you're trying to create resources on
