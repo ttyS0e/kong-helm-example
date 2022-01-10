@@ -11,7 +11,7 @@ CONTAINER_ID=$(docker run -dt --rm -v $(pwd)/out:/host --name inso-builder alpin
 docker exec -it $CONTAINER_ID ash -c "apk add --update nodejs npm libcurl"
 
 # Patch Inso
-cat << EOF > script.ed
+docker exec -it $CONTAINER_ID ash -c "cd /usr/local/lib/node_modules/insomnia-inso/ && cat << EOF > script.ed
 103i
             ...coreAnnotations,
 .
@@ -19,8 +19,9 @@ cat << EOF > script.ed
 w
 q
 
-EOF
-# on this file: node_modules/openapi-2-kong/dist/kubernetes/generate.js
+EOF"
+
+docker exec -it $CONTAINER_ID ash -c "cd /usr/local/lib/node_modules/insomnia-inso/ && ed node_modules/openapi-2-kong/dist/kubernetes/generate.js < script.ed"
 
 # Build Inso standalone executables
 docker exec -it $CONTAINER_ID ash -c "npm install --global pkg insomnia-inso"
