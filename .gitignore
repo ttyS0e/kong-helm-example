@@ -4,3 +4,4 @@
 *-override.yaml
 cp-values.override.yaml
 sample-command.sh
+.DS_Store
