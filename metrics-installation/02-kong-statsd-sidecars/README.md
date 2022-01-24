@@ -46,4 +46,4 @@ env:
   vitals_prometheus_scrape_interval: 10
 ```
 
-4. Apply the Kong control plane and data plane Helm configuration with Helm, as normal.
+5. Apply the Kong control plane and data plane Helm configuration with Helm, as normal.
