@@ -1,0 +1,13 @@
+server:
+  enabled: true
+  global:
+    scrape_interval: 10s
+    scrape_timeout: 5s
+alertmanager:
+  enabled: false
+kubeStateMetrics:
+  enabled: false
+nodeExporter:
+  enabled: false
+pushgateway:
+  enabled: false
