@@ -11,3 +11,6 @@ nodeExporter:
   enabled: false
 pushgateway:
   enabled: false
+configmapReload:
+  prometheus:
+    enabled: false
