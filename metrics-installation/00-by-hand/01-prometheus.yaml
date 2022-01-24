@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  labels:
+    app: prometheus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+      - name: prometheus
+        image: prom/prometheus:v2.25.2
+        args:
+        - "--config.file=/etc/prometheus/prometheus.yml"
+        ports:
+        - name: prometheus
+          containerPort: 9090
+        volumeMounts:
+        - name: prometheus-config
+          mountPath: /etc/prometheus
+      volumes:
+      - name: prometheus-config
+        configMap:
+          name: prometheus-config
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: prometheus
+spec:
+  rules:
+  - host: prometheus.kuma.jack.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: prometheus
+            port:
+              number: 9090
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  labels:
+    app: prometheus
+spec:
+  ports:
+  - name: prometheus
+    port: 9090
+    targetPort: 9090
+  selector:
+    app: prometheus
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+data:
+  prometheus.yml: |
+    rule_files:
+
+    scrape_configs:
+      - job_name: 'vitals_statsd_exporter'
+        scrape_interval: "5s"
+        static_configs:
+          - targets: ['statsd-exporter.api-gateway.svc.cluster.local:9102']
+      - job_name: 'kong_exporter'
+        scrape_interval: "5s"
+        static_configs:
+          - targets: ['kong-kong-stats.api-gateway.svc.cluster.local:9542']
