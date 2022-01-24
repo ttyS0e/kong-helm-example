@@ -5,3 +5,4 @@
 cp-values.override.yaml
 sample-command.sh
 .DS_Store
+patches/inso/out/
