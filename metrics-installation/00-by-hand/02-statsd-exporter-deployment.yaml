@@ -1,0 +1,177 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: statsd-exporter
+  labels:
+    app: statsd-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: statsd-exporter
+  template:
+    metadata:
+      labels:
+        app: statsd-exporter
+    spec:
+      containers:
+      - name: statsd-exporter
+        image: prom/statsd-exporter:v0.20.1
+        args:
+        - "--statsd.mapping-config=/data/statsd-mapping.yml"
+        ports:
+        - name: stats
+          containerPort: 9125
+        - name: stats2
+          containerPort: 9102
+        volumeMounts:
+        - name: statsd-mapping
+          mountPath: /data
+      volumes:
+      - name: statsd-mapping
+        configMap:
+          name: statsd-mapping
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: statsd-exporter
+  labels:
+    app: statsd-exporter
+spec:
+  ports:
+  - name: stats
+    port: 9125
+    targetPort: 9125
+  - name: stats2
+    port: 9102
+    targetPort: 9102
+  selector:
+    app: statsd-exporter
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: statsd-mapping
+data:
+  statsd-mapping.yml: |
+    mappings:
+    - match: kong.api.*.request.count
+      name: "kong_requests_proxy"
+      labels:
+        job: "kong_metrics"
+
+    - match: kong.api.*.status.*
+      name: "kong_status_code"
+      action: drop
+
+    - match: kong.api.*.kong_latency
+      name: "kong_latency_proxy_request"
+      timer_type: histogram
+      buckets: [1]
+      min_max: true
+      labels:
+        job: "kong_metrics"
+
+    - match: kong.api.*.upstream_latency
+      name: "kong_latency_upstream"
+      timer_type: histogram
+      buckets: [1]
+      min_max: true
+      labels:
+        job: "kong_metrics"
+
+    - match: kong.api.*.cache_datastore_hits_total
+      name: "kong_cache_datastore_hits_total"
+      labels:
+        job: "kong_metrics"
+
+    - match: kong.api.*.cache_datastore_misses_total
+      name: "kong_cache_datastore_misses_total"
+      labels:
+        job: "kong_metrics"
+
+    # by Service
+    - match: kong.service.*.request.count
+      name: "kong_requests_proxy"
+      labels:
+        job: "kong_metrics"
+
+    - match: kong.service.*.status.*
+      name: "kong_status_code"
+      labels:
+        service: "$1"
+        status_code: $2
+        job: "kong_metrics"
+
+    - match: kong.service.*.kong_latency
+      name: "kong_latency_proxy_request"
+      timer_type: histogram
+      buckets: [1]
+      min_max: true
+      labels:
+        job: "kong_metrics"
+
+    - match: kong.service.*.upstream_latency
+      name: "kong_latency_upstream"
+      timer_type: histogram
+      buckets: [1]
+      min_max: true
+      labels:
+        job: "kong_metrics"
+
+    - match: kong.service.*.cache_datastore_hits_total
+      name: "kong_cache_datastore_hits_total"
+      labels:
+        job: "kong_metrics"
+
+    - match: kong.service.*.cache_datastore_misses_total
+      name: "kong_cache_datastore_misses_total"
+      labels:
+        job: "kong_metrics"
+
+    # by Service and Route
+    - match: kong.service.*.user.*.status.*
+      name: "kong_status_code_per_consumer"
+      labels:
+        service: "$1"
+        route_id: ""
+        consumer: "$2"
+        status_code: $3
+        job: "kong_metrics"
+
+    - match: kong.route.*.user.*.status.*
+      name: "kong_status_code_per_consumer"
+      labels:
+        service: ""
+        route_id: "$1"
+        consumer: "$2"
+        status_code: $3
+        job: "kong_metrics"
+
+    # by Service and Workspace
+    - match: kong.service.*.workspace.*.status.*
+      name: "kong_status_code_per_workspace"
+      labels:
+        service: "$1"
+        workspace: "$2"
+        status_code: $3
+        job: "kong_metrics"
+
+    # by node
+    - match: kong.node.*.shdict.*.free_space
+      name: "kong_shdict_free_space"
+      labels:
+        node: "$1"
+        shdict: "$2"
+        job: "kong_metrics"
+
+    - match: kong.node.*.shdict.*.capacity
+      name: "kong_shdict_capacity"
+      labels:
+        node: "$1"
+        shdict: "$2"
+        job: "kong_metrics"
